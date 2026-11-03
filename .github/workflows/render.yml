@@ -15,17 +15,19 @@ jobs:
       - name: 1. Checkout Repository
         uses: actions/checkout@v4
 
-      - name: 2. Setup Node & Python TTS
+      - name: 2. Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
 
-      - name: 3. Install Playwright & Edge-TTS
+      - name: 3. Install Dependencies (Playwright, FFmpeg & TTS)
         run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg python3-pip
+          python3 -m pip install --break-system-packages edge-tts gTTS
           npm init -y
           npm install playwright
           npx playwright install --with-deps chromium
-          pip install edge-tts
 
       - name: 4. Render Frames, Audio VO & Merge MP4
         run: |
@@ -37,11 +39,18 @@ jobs:
           const { chromium } = require('playwright');
 
           (async () => {
+            if (!fs.existsSync('data.json')) {
+              throw new Error('File data.json belum ada di luar folder! Pastikan namanya persis data.json');
+            }
+            if (!fs.existsSync('template.html')) {
+              throw new Error('File template.html belum ada di luar folder! Pastikan namanya persis template.html');
+            }
+
             const data = JSON.parse(fs.readFileSync('data.json', 'utf8'));
             const fps = data.fps || 30;
             const browser = await chromium.launch();
             const page = await browser.newPage({ viewport: { width: 1080, height: 1920 } });
-            await page.goto('file://' + path.resolve('template.html'), { waitUntil: 'networkidle' });
+            await page.goto('file://' + path.resolve('template.html'), { waitUntil: 'domcontentloaded' });
 
             const segmentFiles = [];
 
@@ -49,18 +58,23 @@ jobs:
               const s = data.scenes[i];
               console.log(`Rendering Scene ${s.id}...`);
 
-              // 1. Buat Voiceover Bahasa Inggris (Suara Deep Narator: ChristopherNeural)
+              // 1. Buat Voiceover Bahasa Inggris (Otomatis fallback ke gTTS jika Edge diblokir IP GitHub)
               const audioPath = `build/audio/${s.id}.mp3`;
               const cleanVo = s.vo.replace(/"/g, '\\"');
-              execSync(`edge-tts --voice en-US-ChristopherNeural --rate=+5% --text "${cleanVo}" --write-media ${audioPath}`);
+              try {
+                execSync(`python3 -m edge_tts --voice en-US-ChristopherNeural --rate=+5% --text "${cleanVo}" --write-media ${audioPath}`, { stdio: 'pipe' });
+              } catch (err) {
+                console.log('Edge-TTS gagal, beralih ke Google TTS (gTTS)...');
+                execSync(`gtts-cli "${cleanVo}" --lang en --output ${audioPath}`);
+              }
 
-              // 2. Hitung durasi aktual dari panjang audio (atau minimal sesuai s.duration)
+              // 2. Hitung durasi aktual dari panjang audio
               const probe = execSync(`ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 ${audioPath}`).toString().trim();
               const audioDur = parseFloat(probe) || s.duration;
               const actualDuration = Math.max(s.duration, audioDur + 0.4);
               const totalFrames = Math.ceil(actualDuration * fps);
 
-              // 3. Bersihkan folder frame sementara & tangkap tiap frame
+              // 3. Tangkap setiap frame animasi
               execSync('rm -f build/frames/*.jpg');
               for (let f = 0; f < totalFrames; f++) {
                 const progress = f / totalFrames;
