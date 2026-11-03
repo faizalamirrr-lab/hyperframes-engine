@@ -1,56 +1,56 @@
 {
-  "title": "what_if_oxygen_lost_5s",
+  "title": "what_if_earth_lost_oxygen_5_seconds",
   "fps": 30,
   "scenes": [
     {
       "id": "s1",
       "duration": 6,
-      "bg": ["#1e3a8a", "#0f172a"],
-      "topWhite": "EVERY OXYGEN ATOM",
-      "topOrange": "VANISHED FOR 5s?",
+      "bg": ["#0b1b3a", "#1d4e89"],
+      "topWhite": "5 SECONDS WITHOUT",
+      "topOrange": "OXYGEN",
       "preset": "city_timer",
-      "vo": "What if all oxygen on Earth vanished for just five seconds? Holding your breath wouldn't save you.",
-      "highlight": ["oxygen", "five seconds?", "save you."]
+      "vo": "You can hold your breath for five seconds. But Earth with zero percent oxygen? That's fatal.",
+      "highlight": ["five seconds", "fatal"]
     },
     {
       "id": "s2",
       "duration": 7,
-      "bg": ["#312e81", "#1e1b4b"],
+      "bg": ["#1a1a2e", "#5a2f2a"],
       "topWhite": "CONCRETE TURNS",
-      "topOrange": "INTO DUST",
+      "topOrange": "TO DUST",
       "preset": "city_crumble",
-      "vo": "In seconds, every concrete building, bridge, and dam instantly crumbles into dust, because oxygen is the chemical glue.",
-      "highlight": ["concrete", "crumbles", "dust,", "chemical glue."]
+      "vo": "Oxygen is chemical glue. Without it, concrete, buildings and bridges crumble into dust instantly.",
+      "highlight": ["chemical glue", "crumble", "dust"]
     },
     {
       "id": "s3",
       "duration": 8,
-      "bg": ["#090d16", "#1e1b4b"],
-      "topWhite": "DAYTIME SKY GOES",
+      "bg": ["#02030a", "#0a0f2c"],
+      "topWhite": "THE SKY GOES",
       "topOrange": "PITCH BLACK",
       "preset": "sky_blackout",
-      "vo": "The daytime sky turns pitch black with fewer particles to scatter light, while the ozone vanishes, blasting us with raw UV rays.",
-      "highlight": ["pitch black", "scatter light,", "ozone", "UV rays."]
+      "vo": "The daytime sky turns black because nothing is left to scatter light, and the ozone layer vanishes, exposing us to raw UV.",
+      "highlight": ["black", "scatter", "ozone", "UV"]
     },
     {
       "id": "s4",
       "duration": 8,
-      "bg": ["#1e3a8a", "#172554"],
-      "topWhite": "PLANES STALL",
-      "topOrange": "PRESSURE DROPS 21%",
+      "bg": ["#0a1128", "#1c2b5a"],
+      "topWhite": "PRESSURE DROPS",
+      "topOrange": "ENGINES STALL",
       "preset": "plane_emergency",
-      "vo": "Air pressure drops twenty-one percent. Everyone's inner ear pops, and combustion airplanes face emergencies without engines.",
-      "highlight": ["twenty-one percent.", "inner ear", "emergencies"]
+      "vo": "Air pressure drops twenty-one percent, inner ears pop, and combustion engines stall in mid-air.",
+      "highlight": ["twenty-one percent", "inner ears", "stall"]
     },
     {
       "id": "s5",
       "duration": 7,
-      "bg": ["#451a03", "#0f172a"],
+      "bg": ["#1b0f0a", "#4a2a14"],
       "topWhite": "EARTH'S CRUST",
-      "topOrange": "CRUMBLES AWAY",
+      "topOrange": "IS 45% OXYGEN",
       "preset": "crust_collapse",
-      "vo": "Finally, Earth's crust is forty-five percent oxygen. The ground itself crumbles beneath your feet in just five seconds.",
-      "highlight": ["forty-five percent", "crumbles", "five seconds."]
+      "vo": "Even the ground gives way. Earth's crust is forty-five percent oxygen, and it crumbles beneath your feet.",
+      "highlight": ["forty-five percent", "crumbles"]
     }
   ]
 }
