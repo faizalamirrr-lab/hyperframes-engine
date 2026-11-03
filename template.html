@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800;900&display=swap');
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    width: 1080px;
+    height: 1920px;
+    overflow: hidden;
+    font-family: 'Montserrat', sans-serif;
+    background: #0f172a;
+    position: relative;
+  }
+  #canvas {
+    width: 1080px;
+    height: 1920px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    padding: 150px 60px 160px 60px;
+  }
+  .orbit-circle {
+    position: absolute;
+    width: 980px;
+    height: 980px;
+    top: 470px;
+    left: 50px;
+    border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.14);
+    pointer-events: none;
+  }
+  .top-title {
+    text-align: center;
+    z-index: 10;
+    line-height: 1.12;
+  }
+  .title-white {
+    color: #ffffff;
+    font-size: 68px;
+    font-weight: 900;
+    text-shadow: 0 8px 24px rgba(0,0,0,0.35);
+    letter-spacing: 1px;
+  }
+  .title-orange {
+    color: #ff8c24;
+    font-size: 74px;
+    font-weight: 900;
+    text-shadow: 0 8px 24px rgba(0,0,0,0.35);
+    letter-spacing: 1px;
+    margin-top: 6px;
+  }
+  .stage {
+    width: 900px;
+    height: 860px;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 5;
+  }
+  .sub-box {
+    background: rgba(18, 28, 68, 0.94);
+    border: 2px solid rgba(255,255,255,0.15);
+    border-radius: 34px;
+    padding: 38px 50px;
+    width: 920px;
+    text-align: center;
+    font-size: 44px;
+    font-weight: 800;
+    line-height: 1.38;
+    color: #ffffff;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    z-index: 10;
+  }
+  .hl { color: #ff8c24; }
+</style>
+</head>
+<body>
+  <div id="canvas">
+    <div class="orbit-circle" id="orbit"></div>
+    <div class="top-title" id="top-title">
+      <div class="title-white" id="t-white"></div>
+      <div class="title-orange" id="t-orange"></div>
+    </div>
+    <div class="stage" id="stage"></div>
+    <div class="sub-box" id="sub-box"></div>
+  </div>
+
+<script>
+// SVG Generator Isometric 3D (Mirip Video Referensi)
+function getPresetSVG(preset, progress) {
+  const bounce = Math.min(1, progress * 4);
+  const floatY = Math.sin(progress * Math.PI * 4) * 12;
+  const crumbleY = progress > 0.25 ? (progress - 0.25) * 260 : 0;
+  const crumbleOp = progress > 0.25 ? Math.max(0.15, 1 - (progress - 0.25) * 1.3) : 1;
+
+  if (preset === 'city_timer' || preset === 'city_crumble' || preset === 'sky_blackout') {
+    const isCrumble = preset === 'city_crumble';
+    const isBlackout = preset === 'sky_blackout';
+    const secLeft = Math.max(0, Math.ceil(5 - progress * 5));
+    return `
+      <svg viewBox="0 0 700 650" width="820" height="760" style="transform: scale(${0.85 + 0.15 * bounce}) translateY(${floatY}px)">
+        ${isBlackout ? `
+          <circle cx="560" cy="110" r="55" fill="#fde047"/>
+          <circle cx="150" cy="90" r="5" fill="#fff"/><circle cx="280" cy="60" r="4" fill="#fff"/><circle cx="420" cy="100" r="6" fill="#fff"/>
+          <line x1="560" y1="110" x2="320" y2="380" stroke="#c084fc" stroke-width="8" stroke-dasharray="16 10"/>
+          <line x1="560" y1="110" x2="420" y2="400" stroke="#c084fc" stroke-width="8" stroke-dasharray="16 10"/>
+        ` : ''}
+        <!-- Base Isometric Road Platform -->
+        <polygon points="350,240 650,390 350,540 50,390" fill="#e2e8f0"/>
+        <polygon points="50,390 350,540 350,575 50,425" fill="#94a3b8"/>
+        <polygon points="650,390 350,540 350,575 650,425" fill="#64748b"/>
+        <!-- Cross Roads -->
+        <polygon points="230,300 530,450 480,475 180,325" fill="#1e293b"/>
+        <polygon points="470,300 170,450 220,475 520,325" fill="#1e293b"/>
+        <!-- Isometric Skyscrapers -->
+        <g style="transform: translateY(${isCrumble ? crumbleY : 0}px); opacity: ${isCrumble ? crumbleOp : 1}">
+          <!-- Tower Left Purple -->
+          <polygon points="250,90 330,130 250,170 170,130" fill="#e0e7ff"/>
+          <polygon points="170,130 250,170 250,370 170,330" fill="#818cf8"/>
+          <polygon points="330,130 250,170 250,370 330,330" fill="#6366f1"/>
+          <!-- Tower Right Cyan -->
+          <polygon points="450,110 520,145 450,180 380,145" fill="#cffafe"/>
+          <polygon points="380,145 450,180 450,360 380,325" fill="#38bdf8"/>
+          <polygon points="520,145 450,180 450,360 520,325" fill="#0284c7"/>
+          <!-- Small Orange House -->
+          <polygon points="350,330 410,360 350,390 290,360" fill="#fed7aa"/>
+          <polygon points="290,360 350,390 350,445 290,415" fill="#fb923c"/>
+          <polygon points="410,360 350,390 350,445 410,415" fill="#ea580c"/>
+        </g>
+        ${preset === 'city_timer' ? `
+          <circle cx="350" cy="270" r="85" fill="#0f172a" stroke="#ff8c24" stroke-width="14"/>
+          <text x="350" y="298" text-anchor="middle" fill="#ffffff" font-size="82" font-weight="900">${secLeft}s</text>
+        ` : ''}
+        ${isCrumble && progress > 0.25 ? `
+          <circle cx="260" cy="390" r="55" fill="#cbd5e1" opacity="0.85"/>
+          <circle cx="350" cy="370" r="75" fill="#94a3b8" opacity="0.9"/>
+          <circle cx="440" cy="395" r="60" fill="#cbd5e1" opacity="0.85"/>
+        ` : ''}
+      </svg>`;
+  }
+
+  if (preset === 'plane_emergency') {
+    const dropY = progress * 140;
+    return `
+      <svg viewBox="0 0 700 600" width="820" height="700" style="transform: translateY(${dropY}px) rotate(${progress * 10}deg)">
+        <!-- Warning Triangle -->
+        <polygon points="350,70 405,165 295,165" fill="#ff8c24" stroke="#fff" stroke-width="6"/>
+        <text x="350" y="152" text-anchor="middle" fill="#fff" font-size="60" font-weight="900">!</text>
+        <!-- Commercial Airplane (Persis Referensi) -->
+        <polygon points="150,280 95,180 175,180 230,280" fill="#ff8c24"/>
+        <rect x="130" y="250" width="440" height="86" rx="43" fill="#ffffff"/>
+        <rect x="155" y="302" width="380" height="12" rx="6" fill="#3b82f6"/>
+        <polygon points="310,305 240,395 320,395 410,305" fill="#94a3b8"/>
+        <circle cx="240" cy="280" r="9" fill="#1e293b"/><circle cx="285" cy="280" r="9" fill="#1e293b"/>
+        <circle cx="330" cy="280" r="9" fill="#1e293b"/><circle cx="375" cy="280" r="9" fill="#1e293b"/>
+        <circle cx="420" cy="280" r="9" fill="#1e293b"/>
+        <!-- Badge Below Plane -->
+        <rect x="210" y="440" width="280" height="68" rx="34" fill="#ff8c24"/>
+        <text x="350" y="486" text-anchor="middle" fill="#0f172a" font-size="34" font-weight="900">ENGINES OFF</text>
+      </svg>`;
+  }
+
+  // Default: crust_collapse
+  const split = progress * 75;
+  return `
+    <svg viewBox="0 0 700 600" width="820" height="700">
+      <g style="transform: translateX(-${split}px) translateY(${split * 0.6}px) rotate(-${progress * 8}deg)">
+        <polygon points="350,180 350,360 90,240" fill="#eab308"/>
+        <polygon points="90,240 350,360 350,450 90,330" fill="#a16207"/>
+      </g>
+      <g style="transform: translateX(${split}px) translateY(${split * 0.6}px) rotate(${progress * 8}deg)">
+        <polygon points="350,180 610,240 350,360" fill="#ca8a04"/>
+        <polygon points="610,240 350,360 350,450 610,330" fill="#713f12"/>
+      </g>
+      <circle cx="350" cy="150" r="95" fill="#0f172a" stroke="#ff8c24" stroke-width="16"/>
+      <text x="350" y="175" text-anchor="middle" fill="#ffffff" font-size="64" font-weight="900">45%</text>
+    </svg>`;
+}
+
+function formatSub(vo, highlights) {
+  let html = vo;
+  (highlights || []).forEach(word => {
+    const escaped = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const reg = new RegExp(`(${escaped})`, 'gi');
+    html = html.replace(reg, '<span class="hl">$1</span>');
+  });
+  return html;
+}
+
+// Fungsi utama yang dipanggil oleh renderer per-frame di GitHub Actions
+window.renderFrame = function(scene, progress) {
+  const canvas = document.getElementById('canvas');
+  canvas.style.background = `linear-gradient(180deg, ${scene.bg[0]} 0%, ${scene.bg[1]} 100%)`;
+
+  const entryScale = Math.min(1, progress * 5);
+  const topTitle = document.getElementById('top-title');
+  topTitle.style.transform = `scale(${0.7 + 0.3 * entryScale})`;
+  topTitle.style.opacity = entryScale;
+
+  document.getElementById('t-white').textContent = scene.topWhite;
+  document.getElementById('t-orange').textContent = scene.topOrange;
+  document.getElementById('stage').innerHTML = getPresetSVG(scene.preset, progress);
+  document.getElementById('sub-box').innerHTML = formatSub(scene.vo, scene.highlight);
+};
+</script>
+</body>
+</html>
