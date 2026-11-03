@@ -1,0 +1,56 @@
+{
+  "title": "what_if_oxygen_lost_5s",
+  "fps": 30,
+  "scenes": [
+    {
+      "id": "s1",
+      "duration": 6,
+      "bg": ["#1e3a8a", "#0f172a"],
+      "topWhite": "EVERY OXYGEN ATOM",
+      "topOrange": "VANISHED FOR 5s?",
+      "preset": "city_timer",
+      "vo": "What if all oxygen on Earth vanished for just five seconds? Holding your breath wouldn't save you.",
+      "highlight": ["oxygen", "five seconds?", "save you."]
+    },
+    {
+      "id": "s2",
+      "duration": 7,
+      "bg": ["#312e81", "#1e1b4b"],
+      "topWhite": "CONCRETE TURNS",
+      "topOrange": "INTO DUST",
+      "preset": "city_crumble",
+      "vo": "In seconds, every concrete building, bridge, and dam instantly crumbles into dust, because oxygen is the chemical glue.",
+      "highlight": ["concrete", "crumbles", "dust,", "chemical glue."]
+    },
+    {
+      "id": "s3",
+      "duration": 8,
+      "bg": ["#090d16", "#1e1b4b"],
+      "topWhite": "DAYTIME SKY GOES",
+      "topOrange": "PITCH BLACK",
+      "preset": "sky_blackout",
+      "vo": "The daytime sky turns pitch black with fewer particles to scatter light, while the ozone vanishes, blasting us with raw UV rays.",
+      "highlight": ["pitch black", "scatter light,", "ozone", "UV rays."]
+    },
+    {
+      "id": "s4",
+      "duration": 8,
+      "bg": ["#1e3a8a", "#172554"],
+      "topWhite": "PLANES STALL",
+      "topOrange": "PRESSURE DROPS 21%",
+      "preset": "plane_emergency",
+      "vo": "Air pressure drops twenty-one percent. Everyone's inner ear pops, and combustion airplanes face emergencies without engines.",
+      "highlight": ["twenty-one percent.", "inner ear", "emergencies"]
+    },
+    {
+      "id": "s5",
+      "duration": 7,
+      "bg": ["#451a03", "#0f172a"],
+      "topWhite": "EARTH'S CRUST",
+      "topOrange": "CRUMBLES AWAY",
+      "preset": "crust_collapse",
+      "vo": "Finally, Earth's crust is forty-five percent oxygen. The ground itself crumbles beneath your feet in just five seconds.",
+      "highlight": ["forty-five percent", "crumbles", "five seconds."]
+    }
+  ]
+}
