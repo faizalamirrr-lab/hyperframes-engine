@@ -1,0 +1,92 @@
+name: HyperFrames Cloud Renderer
+
+on:
+  push:
+    paths:
+      - 'data.json'
+      - 'template.html'
+      - '.github/workflows/render.yml'
+  workflow_dispatch:
+
+jobs:
+  build-video:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 1. Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: 2. Setup Node & Python TTS
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: 3. Install Playwright & Edge-TTS
+        run: |
+          npm init -y
+          npm install playwright
+          npx playwright install --with-deps chromium
+          pip install edge-tts
+
+      - name: 4. Render Frames, Audio VO & Merge MP4
+        run: |
+          mkdir -p build/frames build/audio out
+          cat << 'EOF' > render.js
+          const fs = require('fs');
+          const path = require('path');
+          const { execSync } = require('child_process');
+          const { chromium } = require('playwright');
+
+          (async () => {
+            const data = JSON.parse(fs.readFileSync('data.json', 'utf8'));
+            const fps = data.fps || 30;
+            const browser = await chromium.launch();
+            const page = await browser.newPage({ viewport: { width: 1080, height: 1920 } });
+            await page.goto('file://' + path.resolve('template.html'), { waitUntil: 'networkidle' });
+
+            const segmentFiles = [];
+
+            for (let i = 0; i < data.scenes.length; i++) {
+              const s = data.scenes[i];
+              console.log(`Rendering Scene ${s.id}...`);
+
+              // 1. Buat Voiceover Bahasa Inggris (Suara Deep Narator: ChristopherNeural)
+              const audioPath = `build/audio/${s.id}.mp3`;
+              const cleanVo = s.vo.replace(/"/g, '\\"');
+              execSync(`edge-tts --voice en-US-ChristopherNeural --rate=+5% --text "${cleanVo}" --write-media ${audioPath}`);
+
+              // 2. Hitung durasi aktual dari panjang audio (atau minimal sesuai s.duration)
+              const probe = execSync(`ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 ${audioPath}`).toString().trim();
+              const audioDur = parseFloat(probe) || s.duration;
+              const actualDuration = Math.max(s.duration, audioDur + 0.4);
+              const totalFrames = Math.ceil(actualDuration * fps);
+
+              // 3. Bersihkan folder frame sementara & tangkap tiap frame
+              execSync('rm -f build/frames/*.jpg');
+              for (let f = 0; f < totalFrames; f++) {
+                const progress = f / totalFrames;
+                await page.evaluate(({ scene, prog }) => window.renderFrame(scene, prog), { scene: s, prog: progress });
+                const frameNum = String(f).padStart(5, '0');
+                await page.screenshot({ path: `build/frames/f_${frameNum}.jpg`, type: 'jpeg', quality: 92 });
+              }
+
+              // 4. Gabungkan frame + audio per scene menjadi segmen MP4
+              const segMp4 = `build/seg_${i}.mp4`;
+              execSync(`ffmpeg -y -framerate ${fps} -i build/frames/f_%05d.jpg -i ${audioPath} -c:v libx264 -pix_fmt yuv420p -c:a aac -b:a 192k -shortest -t ${actualDuration} ${segMp4}`);
+              segmentFiles.push(`file 'seg_${i}.mp4'`);
+            }
+
+            await browser.close();
+
+            // 5. Satukan semua scene menjadi 1 video MP4 utuh
+            fs.writeFileSync('build/list.txt', segmentFiles.join('\n'));
+            execSync(`ffmpeg -y -f concat -safe 0 -i build/list.txt -c copy out/${data.title || 'video'}.mp4`);
+            console.log('DONE!');
+          })();
+          EOF
+          node render.js
+
+      - name: 5. Upload Final MP4 Video
+        uses: actions/upload-artifact@v4
+        with:
+          name: final-whatif-short-mp4
+          path: out/*.mp4
